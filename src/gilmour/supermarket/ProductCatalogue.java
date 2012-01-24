@@ -1,5 +1,6 @@
 package gilmour.supermarket;
 
+import java.util.List;
 import java.util.Vector;
 
 public class ProductCatalogue {
@@ -9,7 +10,9 @@ public class ProductCatalogue {
 	 * represented by this class
 	 */
 
-	private Vector<Product> product_catalogue = new Vector<Product>();
+	//private Vector<Product> product_catalogue = new Vector<Product>();
+	private List<Product> product_catalogue = new Vector<Product>();
+	
 
 	public void addProduct(Product p) {
 		if (!product_catalogue.contains(p))
@@ -17,7 +20,7 @@ public class ProductCatalogue {
 	}
 
 	public Vector<Product> getCatalogue() {
-		return this.product_catalogue;
+		return (Vector<Product>) this.product_catalogue;
 	}
 
 	// removeProduct()

@@ -7,10 +7,17 @@ package gilmour.supermarket;
 
 public interface Deal {
 
-	public String getDealType();
+	public String getDealName();
 
 	public int getDealCondition();
 
 	public Product getProduct();
+	
+	/*
+	 * applyDiscount returns the amount of savings, by applying the deal to this
+	 * product
+	 */
+	
+	public double applyDiscount(int amountOfProduct);
 
 }

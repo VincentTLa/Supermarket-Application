@@ -7,19 +7,7 @@ public class UnitProduct extends Product {
 	 * its weight e.g. a chocolate bar
 	 */
 
-	private double unitCost;
-
 	public UnitProduct(String id, String name, double cost) {
-		super(id, name);
-		unitCost = cost;
+		super(id, name, cost);
 	}
-
-	public double getUnitCost() {
-		return unitCost;
-	}
-
-	public void setUnitCost(double newUnitCost) {
-		unitCost = newUnitCost;
-	}
-
 }

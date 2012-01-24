@@ -17,7 +17,6 @@ import javax.swing.event.ListSelectionListener;
 @SuppressWarnings("serial")
 public class ViewCartPanel extends JPanel {
 
-
 	private ListSelectionListener mListSelectionListener;
 	private JList list;
 	private DefaultListModel listmodel;
@@ -38,30 +37,36 @@ public class ViewCartPanel extends JPanel {
 		 * the list of cart items
 		 */
 		listmodel.clear();
-		Iterator<UnitProduct> unitProducts = checkOut.getUnitBasketIterator();
-		while (unitProducts.hasNext()) {
-			UnitProduct up = unitProducts.next();
-			int quantity = ShoppingBasket.getBasketInstance().getUnitBasket()
-					.get(up);
-			String total = String.format("%.2f", (up.getUnitCost() * quantity));
-			String element = up.getProductId() + " " + up.getProductName()
-					+ " x " + quantity + " = $" + total;
+
+		Iterator<Product> i = checkOut.getBasketIterator();
+		while (i.hasNext()) {
+			Product product = i.next();
+			String total = null;
+			String element = null;
+			int amount = checkOut.getAmount(product);
+
+			if (product instanceof UnitProduct) {
+				total = String.format("%.2f", product.getProductPrice()
+						* amount);
+				element = product.getProductId() + " "
+						+ product.getProductName() + " @$"
+						+ product.getProductPrice() + " each." + " Quantity = "
+						+ amount + " = $" + total;
+
+			} else if (product instanceof WeighableProduct) {
+				total = String.format("%.2f",
+						((WeighableProduct) product).getPricePerGram()
+								* checkOut.getAmount(product));
+				element = product.getProductId() + " "
+						+ product.getProductName() + " @$"
+						+ product.getProductPrice() + " per "
+						+ ((WeighableProduct) product).getPriceMetric()
+						+ " grams. Quantity = " + amount + " grams = $" + total;
+			} else
+				total = "error";
 			listmodel.addElement(element);
 		}
 
-		Iterator<WeighableProduct> weighProducts = checkOut
-				.getWeighablesBasketIterator();
-		while (weighProducts.hasNext()) {
-			WeighableProduct wp = weighProducts.next();
-			double quantity = ShoppingBasket.getBasketInstance()
-					.getWeighablesBasket().get(wp);
-			String weight = String.format("%.3f", quantity);
-			String total = String.format("%.2f", (wp.getCostPer100G()
-					* quantity * 10));
-			String element = wp.getProductId() + " " + wp.getProductName()
-					+ " x " + weight + " kg" + " = $" + total;
-			listmodel.addElement(element);
-		}
 		list.setModel(listmodel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);

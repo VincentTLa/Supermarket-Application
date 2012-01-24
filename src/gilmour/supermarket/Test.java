@@ -5,8 +5,8 @@ public class Test {
 	public static void main(String[] args) {
 		// create some products
 		UnitProduct coke = new UnitProduct("U001", "Coke (Can)", 0.50);
-		WeighableProduct carrots = new WeighableProduct("W002", "Carrots", 1.00);
-		WeighableProduct apples = new WeighableProduct("W001", "Apples", 0.67);
+		WeighableProduct carrots = new WeighableProduct("W002", "Carrots", 1.00, 100);
+		WeighableProduct apples = new WeighableProduct("W001", "Apples", 0.67, 100);
 		UnitProduct crisps = new UnitProduct("U002",
 				"Walker's Crisps (Family Pack)", 1.68);
 		// add products to catalogue

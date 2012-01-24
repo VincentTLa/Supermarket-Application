@@ -37,14 +37,14 @@ public class ViewProductsPanel extends JPanel {
 		for (int x = 0; x < pc.getCatalogue().size(); x++) {
 			if (pc.getCatalogue().get(x) instanceof UnitProduct) {
 				UnitProduct up = (UnitProduct) pc.getCatalogue().get(x);
-				String cost = String.format("%.2f", up.getUnitCost());
+				String cost = String.format("%.2f", up.getProductPrice());
 				listmodel.addElement(up.getProductName() + " $" + cost);
 			} else {
 				WeighableProduct wp = (WeighableProduct) pc.getCatalogue().get(
 						x);
-				String cost = String.format("%.2f", wp.getCostPer100G());
+				String cost = String.format("%.2f", wp.getProductPrice());
 				listmodel.addElement(wp.getProductName() + " $" + cost
-						+ "/100g");
+						+ " per " + wp.getPriceMetric() + " grams");
 			}
 		}
 		list.setModel(listmodel);

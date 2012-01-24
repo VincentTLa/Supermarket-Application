@@ -7,7 +7,7 @@ public class ItemDiscount implements Deal {
 	 * condition of the deal is expressed as an integer, so '25' means 25% off
 	 */
 
-	private final String DEAL_TYPE = "Discount";
+	private final String dealName = "Discount";
 	private int dealCondition;
 	private Product mProduct;
 
@@ -17,8 +17,8 @@ public class ItemDiscount implements Deal {
 	}
 
 	@Override
-	public String getDealType() {
-		return DEAL_TYPE;
+	public String getDealName() {
+		return dealName;
 	}
 
 	@Override
@@ -29,5 +29,24 @@ public class ItemDiscount implements Deal {
 	@Override
 	public Product getProduct() {
 		return mProduct;
+	}
+
+	@Override
+	public double applyDiscount(int amountOfProduct) {
+		WeighableProduct wProduct = null;
+		UnitProduct uProduct = null;
+		double total_before_discount = 0;
+		// check mProduct's type + overall cost
+		if (mProduct instanceof WeighableProduct) {
+			wProduct = (WeighableProduct) mProduct;
+			total_before_discount = wProduct.getPricePerGram()
+					* amountOfProduct;
+		} else {
+			uProduct = (UnitProduct) mProduct;
+			total_before_discount = uProduct.getProductPrice()
+					* amountOfProduct;
+		}
+		// Apply discount
+		return total_before_discount * this.dealCondition / 100;
 	}
 }

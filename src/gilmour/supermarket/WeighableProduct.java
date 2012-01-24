@@ -7,19 +7,23 @@ public class WeighableProduct extends Product {
 	 * based on weight
 	 */
 
-	private double costPer100Grams;
+	private int price_metric;// weight at which price is based
 
-	public WeighableProduct(String id, String name, double cost) {
-		super(id, name);
-		costPer100Grams = cost;
+	public WeighableProduct(String id, String name, double cost, int metric) {
+		super(id, name, cost);
+		price_metric = metric;
 	}
 
-	public double getCostPer100G() {
-		return costPer100Grams;
+	public int getPriceMetric() {
+		return price_metric;
 	}
 
-	public void setCostPerWeight(double newCostPerWeight) {
-		costPer100Grams = newCostPerWeight;
+	public void setPriceMetric(int newPriceMetric) {
+		price_metric = newPriceMetric;
+	}
+	
+	public double getPricePerGram (){
+		return (super.getProductPrice()/price_metric); 
 	}
 
 }

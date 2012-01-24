@@ -76,7 +76,7 @@ public class ControlButtonHandler implements ActionListener {
 
 		if (action.equals(ViewFrame.ACTION_CHECKOUT)) {
 
-			double subtotal = mCheckOut.getSubTotal();
+			double subtotal = mCheckOut.getSubtotal();
 			double discounts = mCheckOut.getDiscounts();
 			String msg = "SUB-TOTAL = $" + subtotal + "\nDiscounts = $"
 					+ discounts + "\nTOTAL $" + (subtotal - discounts);

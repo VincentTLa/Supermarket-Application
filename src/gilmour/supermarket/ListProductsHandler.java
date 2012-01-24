@@ -53,10 +53,6 @@ public class ListProductsHandler implements ActionListener,
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String response;
-		int iQuantity;
-		double dWeight;
-		UnitProduct uProduct = null;
-		WeighableProduct wProduct = null;
 		Product product = null;
 
 		String action = ((JButton) e.getSource()).getActionCommand();
@@ -70,20 +66,13 @@ public class ListProductsHandler implements ActionListener,
 				JOptionPane.showMessageDialog(null, USE_LIST_WARNING, "Error",
 						JOptionPane.WARNING_MESSAGE);
 			// edit the quantity of that Product
-			else if (product instanceof UnitProduct) {
-				uProduct = (UnitProduct) product;
-				this.editQuantity(uProduct);
-			} else {
-				// TODO REVIEW NOTE: Is this lazy coding?
-				// Future versions could add more Product types, causing bugs
-				// here?
-				wProduct = (WeighableProduct) product;
-				this.editQuantity(wProduct);
-			}
-			// refresh the Cart
+			else
+				this.editQuantity(product);
+
 			mViewFrame.showCart(mCheckOut);
 		}
 		/* REMOVE ALL ITEMS (of selected product type) from the shopping cart */
+
 		if (action.equals(ViewFrame.ACTION_REMOVE_ALL)) {
 			// resolve the choice to a product
 			product = resolveCartChoiceToProduct();
@@ -91,12 +80,8 @@ public class ListProductsHandler implements ActionListener,
 				JOptionPane.showMessageDialog(null, USE_LIST_WARNING, "Error",
 						JOptionPane.WARNING_MESSAGE);
 			// remove Product from appropriate Basket
-			else if (product instanceof UnitProduct)
-				ShoppingBasket.getBasketInstance().removeProductByType(
-						(UnitProduct) product);
-			if (product instanceof WeighableProduct)
-				ShoppingBasket.getBasketInstance().removeProductByType(
-						(WeighableProduct) product);
+			else
+				ShoppingBasket.getBasketInstance().removeProductByType(product);
 			// refresh the cart as displayed in the UI
 			mViewFrame.showCart(mCheckOut);
 			// remove 'edit cart' buttons if basket is empty
@@ -104,18 +89,18 @@ public class ListProductsHandler implements ActionListener,
 				mViewFrame.showCartEditButtons(false);
 		}
 		/* ADD ITEMS TO CART */
+
 		if (action.equals(ViewFrame.ACTION_ADD_TO_CART)) {
-			product = mProductCatalogue.getCatalogue()
-					.get(product_panel_choice);
+			/*
+			 * The list of items on sale is generated from the product
+			 * catalogue, so the sequence in the list should be the same as in
+			 * the product catalogue
+			 */
+			product = mProductCatalogue.getCatalogue().get(
+					product_panel_choice);
 			boolean nothing_entered = false;
 			// create the appropriate input dialog + validate response
 			do {
-
-				/*
-				 * TODO REVIEW NOTE: Is there a more elegant way to validate
-				 * 'reponse' and have a persitent entry UI but still allowing
-				 * user to CANCEL - without using this 'nothing_entered' flag?
-				 */
 				response = JOptionPane
 						.showInputDialog(createAddProductPrompt(product));
 				if (response == null | response == "")
@@ -126,18 +111,10 @@ public class ListProductsHandler implements ActionListener,
 			 * add the items to the cart if !nothing_entered (i.e. user HAS
 			 * entered a valid quantity/weight to add)
 			 */
-			
-			if (product instanceof UnitProduct && !nothing_entered) {
-				iQuantity = Integer.parseInt(response);
-				uProduct = (UnitProduct) product;
-				ShoppingBasket.getBasketInstance().addProduct(uProduct,
-						iQuantity);
-			}
-			if (product instanceof WeighableProduct && !nothing_entered) {
-				dWeight = Double.parseDouble(response);
-				wProduct = (WeighableProduct) product;
-				ShoppingBasket.getBasketInstance()
-						.addProduct(wProduct, dWeight);
+
+			if (!nothing_entered) {
+				int amount = Integer.parseInt(response);
+				ShoppingBasket.getBasketInstance().addProduct(product, amount);
 			}
 		}
 	}
@@ -146,10 +123,12 @@ public class ListProductsHandler implements ActionListener,
 	 * *** HELPER METHODS ***
 	 */
 
+	// This validates data entered by the user
+
 	private boolean validateAlterCartQuantity(String response, Product p) {
 		if (response == "" || response == null)
 			return true;
-		else if (p instanceof UnitProduct) {
+		else {
 			try {
 				Integer.parseInt(response);
 			} catch (NumberFormatException e) {
@@ -158,18 +137,14 @@ public class ListProductsHandler implements ActionListener,
 						JOptionPane.WARNING_MESSAGE);
 				return false;
 			}
-		} else {
-			try {
-				Double.parseDouble(response);
-			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(null,
-						"Please use decimal places, e.g. 0.1 is 100 grams",
-						"Error", JOptionPane.WARNING_MESSAGE);
-				return false;
-			}
+			return true;
 		}
-		return true;
 	}
+
+	/*
+	 * Provides a grammatically corrent prompt to the user depending on product
+	 * type
+	 */
 
 	private String createAddProductPrompt(Product product) {
 		String msg;
@@ -177,45 +152,46 @@ public class ListProductsHandler implements ActionListener,
 			msg = "How many " + product.getProductName()
 					+ "s would you like to add to your cart?";
 		} else {
-			msg = "How many kg of " + product.getProductName()
+			msg = "How many grams of " + product.getProductName()
 					+ " would you like to add to your cart?";
 		}
 		return msg;
 
 	}
 
-	private void editQuantity(WeighableProduct wp) {
-		String msg = "Enter how many kg's of " + wp.getProductName()
-				+ " you want to remove";
+	/*
+	 * This method is called from the actionPerformed method - gets user
+	 * response, validates and executes task
+	 */
+
+	private void editQuantity(Product product) {
+		String msg;
+		if (product instanceof WeighableProduct) {
+			msg = "Enter how many grams of " + product.getProductName()
+					+ " you want to remove";
+		} else {
+			msg = "Enter how many " + product.getProductName()
+					+ "s you want to remove";
+		}
+
 		String answer;
 		boolean nothing_entered = false;
 		do {
 			answer = JOptionPane.showInputDialog(msg);
 			if (answer == null | answer == "")
 				nothing_entered = true;
-		} while (!validateAlterCartQuantity(answer, wp));
-		if (!nothing_entered) {
-			double nEdit = Double.valueOf(answer);
-			ShoppingBasket.getBasketInstance().removeProduct(wp, nEdit);
-		}
+		} while (!validateAlterCartQuantity(answer, product));
 
-	}
-
-	private void editQuantity(UnitProduct up) {
-		String msg = "Enter how many " + up.getProductName()
-				+ "s you want to remove";
-		String answer;
-		boolean nothing_entered = false;
-		do {
-			answer = JOptionPane.showInputDialog(msg);
-			if (answer == null | answer == "")
-				nothing_entered = true;
-		} while (!validateAlterCartQuantity(answer, up));
 		if (!nothing_entered) {
-			int nEdit = Integer.parseInt(answer);
-			ShoppingBasket.getBasketInstance().removeProduct(up, nEdit);
+			int amount = Integer.parseInt(answer);
+			ShoppingBasket.getBasketInstance().removeProduct(product, amount);
 		}
 	}
+
+	/*
+	 * This method is also called from actionPerformed, and returns null (if no
+	 * item on list was selected) or returns the product (using the Product ID)
+	 */
 
 	private Product resolveCartChoiceToProduct() {
 		Product tmp = null;
@@ -229,6 +205,10 @@ public class ListProductsHandler implements ActionListener,
 			product_code = detail.substring(0, 4);
 			for (int x = 0; x < mProductCatalogue.getCatalogue().size(); x++) {
 				tmp = mProductCatalogue.getCatalogue().elementAt(x);
+				/*
+				 * Search through the product catalogue until a product with
+				 * matching ID is found
+				 */
 				if (tmp.getProductId().equals(product_code))
 					product = tmp;
 			}
